@@ -81,6 +81,7 @@ module ExecJS
       if @multi_context
         @stdin.write(JSON.dump([context_id]) + "\n")
         @stdin.flush
+        @stdout.readline
       else
         @stdin.close
         @stdout.close

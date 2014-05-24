@@ -12,11 +12,11 @@ module ExecJS
         exec source
       end
 
-      def exec(source, options = {})
-        eval "(function(){#{source}})()", options
+      def exec(source)
+        eval "(function(){#{source}})()"
       end
 
-      def eval(source, _options = {})
+      def eval(source)
         source.encode!('UTF-8')
 
         if /\S/ =~ source
@@ -45,10 +45,6 @@ module ExecJS
       fail NotImplementedError
     end
 
-    def context_class
-      self.class::Context
-    end
-
     def exec(source)
       context = context_class.new(self)
       context.exec(source)
@@ -69,6 +65,12 @@ module ExecJS
 
     def available?
       fail NotImplementedError
+    end
+
+    private
+
+    def context_class
+      self.class::Context
     end
   end
 end
