@@ -5,7 +5,7 @@ module ExecJS
     class Context < Runtime::Context
       def create_context
         @rhino_context = org.mozilla.javascript.Context.enter()
-        @rhino_scope = @rhino_context.initStandardObjects();
+        @rhino_scope = @rhino_context.initStandardObjects()
       end
 
       def evaluate_string(str)

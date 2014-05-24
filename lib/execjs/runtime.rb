@@ -7,6 +7,7 @@ module ExecJS
     class Context
       def initialize(runtime, source = "")
         @mutex = Mutex.new
+        @runtime = runtime
         create_context
         exec source
       end
