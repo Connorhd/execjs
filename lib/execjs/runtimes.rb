@@ -1,12 +1,11 @@
 require 'execjs/module'
 require 'execjs/disabled_runtime'
-require 'execjs/external_runtime'
 require 'execjs/ruby_racer_runtime'
 require 'execjs/rhino_runtime'
 require 'execjs/rjb_rhino_runtime'
 require 'execjs/nashorn_runtime'
 require 'execjs/rjb_nashorn_runtime'
-require 'execjs/persistent_external_runtime'
+require 'execjs/external_runtime'
 
 module ExecJS
   module Runtimes
@@ -22,53 +21,26 @@ module ExecJS
 
     RjbNashorn = RjbNashornRuntime.new
 
-    PersistentNode = PersistentExternalRuntime.new(
+    PersistentNode = ExternalRuntime.new(
       name:          'Persistent Node.js (V8)',
       command:       %w(nodejs node),
       runner_path:   ExecJS.root + '/support/persistent_node_runner.js',
       multi_context: true
     )
 
-    PersistentJavaScriptCore = PersistentExternalRuntime.new(
+    PersistentJavaScriptCore = ExternalRuntime.new(
       name:          'Persistent Node.js (V8)',
       command:       '/System/Library/Frameworks/JavaScriptCore.framework/Versions/A/Resources/jsc',
       runner_path:   ExecJS.root + '/support/persistent_jsc_runner.js',
-      multi_context: true
+      multi_context: false
     )
 
-    PersistentJScript = PersistentExternalRuntime.new(
+    PersistentJScript = ExternalRuntime.new(
       name:          'Persistent JScript',
       command:       'cscript //E:jscript //Nologo',
       runner_path:   ExecJS.root + '/support/persistent_jscript_runner.js',
-      multi_context: true
+      multi_context: false
     )
-
-    # Node = ExternalRuntime.new(
-    #   name:        "Node.js (V8)",
-    #   command:     ["nodejs", "node"],
-    #   runner_path: ExecJS.root + "/support/node_runner.js",
-    #   encoding:    'UTF-8'
-    # )
-
-    # JavaScriptCore = ExternalRuntime.new(
-    #   name:        "JavaScriptCore",
-    #   command:     "/System/Library/Frameworks/JavaScriptCore.framework/Versions/A/Resources/jsc",
-    #   runner_path: ExecJS.root + "/support/jsc_runner.js"
-    # )
-
-    # SpiderMonkey = Spidermonkey = ExternalRuntime.new(
-    #   name:        "SpiderMonkey",
-    #   command:     "js",
-    #   runner_path: ExecJS.root + "/support/spidermonkey_runner.js",
-    #   deprecated:  true
-    # )
-
-    # JScript = ExternalRuntime.new(
-    #   name:        "JScript",
-    #   command:     "cscript //E:jscript //Nologo //U",
-    #   runner_path: ExecJS.root + "/support/jscript_runner.js",
-    #   encoding:    'UTF-16LE' # CScript with //U returns UTF-16LE
-    # )
 
     def self.autodetect
       from_environment || best_available ||
@@ -100,18 +72,14 @@ module ExecJS
 
     def self.runtimes
       @runtimes ||= [
-        RubyRacer,
-        Rhino,
-        RjbRhino,
-        Nashorn,
-        RjbNashorn,
         PersistentNode,
-        PersistentJavaScriptCore,
+        RubyRacer,
+        Nashorn,
+        Rhino,
+        RjbNashorn,
+        RjbRhino,
         PersistentJScript,
-        # Node,
-        # JavaScriptCore,
-        # SpiderMonkey,
-        # JScript
+        PersistentJavaScriptCore,
       ]
     end
   end

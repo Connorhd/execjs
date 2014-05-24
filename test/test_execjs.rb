@@ -177,7 +177,7 @@ class TestExecJS < Test
     assert_equal 1, context.eval('x')
   end
 
-  # def test_isolated_context
+  # def test_isolated_contexts
   #   context1 = ExecJS.compile('')
   #   context2 = ExecJS.compile('')
   #   context1.exec('x = 1')
