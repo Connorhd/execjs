@@ -4,6 +4,7 @@ require 'execjs/external_runtime'
 require 'execjs/ruby_racer_runtime'
 require 'execjs/ruby_rhino_runtime'
 require 'execjs/nashorn_runtime'
+require 'execjs/rjb_nashorn_runtime'
 require 'execjs/persistent_external_runtime'
 
 module ExecJS
@@ -15,6 +16,8 @@ module ExecJS
     RubyRhino = RubyRhinoRuntime.new
 
     Nashorn = NashornRuntime.new
+
+    RjbNashorn = RjbNashornRuntime.new
 
     PersistentNode = PersistentExternalRuntime.new(
       name:          'Persistent Node.js (V8)',
@@ -97,6 +100,7 @@ module ExecJS
         RubyRacer,
         RubyRhino,
         Nashorn,
+        RjbNashorn,
         PersistentNode,
         PersistentJavaScriptCore,
         PersistentJScript,

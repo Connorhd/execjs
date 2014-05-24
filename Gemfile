@@ -4,5 +4,6 @@ gemspec
 
 group :test do
   gem 'therubyracer', platform: :mri
+  gem 'rjb', platform: :mri
   gem 'therubyrhino_jar', platform: :jruby
 end
