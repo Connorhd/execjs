@@ -1,10 +1,10 @@
-require "execjs/runtime"
+require 'execjs/runtime'
 
 module ExecJS
   class NashornRuntime < Runtime
     class Context < Runtime::Context
       def create_context
-        @nashorn_context = javax.script.ScriptEngineManager.new().getEngineByName("nashorn")
+        @nashorn_context = javax.script.ScriptEngineManager.new.getEngineByName('nashorn')
       end
 
       def evaluate_string(str)
@@ -19,11 +19,11 @@ module ExecJS
     end
 
     def name
-      "nashorn (Java 8)"
+      'nashorn (Java 8)'
     end
 
     def available?
-      javax.script.ScriptEngineManager.new().getEngineByName("nashorn") != nil
+      !javax.script.ScriptEngineManager.new.getEngineByName('nashorn').nil?
     rescue NameError
       false
     end

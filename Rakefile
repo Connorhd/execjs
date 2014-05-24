@@ -1,34 +1,34 @@
-require "rake/testtask"
+require 'rake/testtask'
 
-task :default => :test
+task default: :test
 
-$:.unshift File.expand_path("../lib", __FILE__)
-require "execjs/runtimes"
+$LOAD_PATH.unshift File.expand_path('../lib', __FILE__)
+require 'execjs/runtimes'
 
-tests = namespace :test do |tests|
+tests = namespace :test do |_tests|
   ExecJS::Runtimes.names.each do |name|
     next if ExecJS::Runtimes.const_get(name).deprecated?
 
     task(name.downcase) do
-      ENV["EXECJS_RUNTIME"] = name.to_s
+      ENV['EXECJS_RUNTIME'] = name.to_s
     end
 
     Rake::TestTask.new(name.downcase) do |t|
-      t.libs << "test"
+      t.libs << 'test'
       t.warning = true
     end
   end
 end
 
 def banner(text)
-  warn ""
-  warn "=" * Rake.application.terminal_width
+  warn ''
+  warn '=' * Rake.application.terminal_width
   warn text
-  warn "=" * Rake.application.terminal_width
-  warn ""
+  warn '=' * Rake.application.terminal_width
+  warn ''
 end
 
-desc "Run tests for all installed runtimes"
+desc 'Run tests for all installed runtimes'
 task :test do
   passed  = []
   failed  = []
@@ -39,10 +39,10 @@ task :test do
 
     begin
       task.invoke
-    rescue Exception => e
-      if e.message[/Command failed with status \((\d+)\)/, 1] == "2"
+    rescue => e
+      if e.message[/Command failed with status \((\d+)\)/, 1] == '2'
         skipped << task.name
-      elsif e.message == "2" # jruby
+      elsif e.message == '2' # jruby
         skipped << task.name
       else
         failed << task.name
@@ -52,11 +52,11 @@ task :test do
     end
   end
 
-  messages = ["PASSED:  #{passed.join(", ")}"]
-  messages << "SKIPPED: #{skipped.join(", ")}" if skipped.any?
-  messages << "FAILED:  #{failed.join(", ")}" if failed.any?
+  messages = ["PASSED:  #{passed.join(', ')}"]
+  messages << "SKIPPED: #{skipped.join(', ')}" if skipped.any?
+  messages << "FAILED:  #{failed.join(', ')}" if failed.any?
   banner messages.join("\n")
 
-  raise "test failures" if failed.any?
-  raise "all tests skipped" if !passed.any?
+  fail 'test failures' if failed.any?
+  fail 'all tests skipped' unless passed.any?
 end

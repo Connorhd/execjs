@@ -1,10 +1,10 @@
-require "execjs/module"
-require "execjs/disabled_runtime"
-require "execjs/external_runtime"
-require "execjs/ruby_racer_runtime"
-require "execjs/ruby_rhino_runtime"
-require "execjs/nashorn_runtime"
-require "execjs/persistent_external_runtime"
+require 'execjs/module'
+require 'execjs/disabled_runtime'
+require 'execjs/external_runtime'
+require 'execjs/ruby_racer_runtime'
+require 'execjs/ruby_rhino_runtime'
+require 'execjs/nashorn_runtime'
+require 'execjs/persistent_external_runtime'
 
 module ExecJS
   module Runtimes
@@ -17,23 +17,23 @@ module ExecJS
     Nashorn = NashornRuntime.new
 
     PersistentNode = PersistentExternalRuntime.new(
-      name:          "Persistent Node.js (V8)",
-      command:       ["nodejs", "node"],
-      runner_path:   ExecJS.root + "/support/persistent_node_runner.js",
+      name:          'Persistent Node.js (V8)',
+      command:       %w(nodejs node),
+      runner_path:   ExecJS.root + '/support/persistent_node_runner.js',
       multi_context: true
     )
 
     PersistentJavaScriptCore = PersistentExternalRuntime.new(
-      name:          "Persistent Node.js (V8)",
-      command:       "/System/Library/Frameworks/JavaScriptCore.framework/Versions/A/Resources/jsc",
-      runner_path:   ExecJS.root + "/support/persistent_jsc_runner.js",
+      name:          'Persistent Node.js (V8)',
+      command:       '/System/Library/Frameworks/JavaScriptCore.framework/Versions/A/Resources/jsc',
+      runner_path:   ExecJS.root + '/support/persistent_jsc_runner.js',
       multi_context: true
     )
-    
+
     PersistentJScript = PersistentExternalRuntime.new(
-      name:          "Persistent JScript",
-      command:       "cscript //E:jscript //Nologo",
-      runner_path:   ExecJS.root + "/support/persistent_jscript_runner.js",
+      name:          'Persistent JScript',
+      command:       'cscript //E:jscript //Nologo',
+      runner_path:   ExecJS.root + '/support/persistent_jscript_runner.js',
       multi_context: true
     )
 
@@ -64,33 +64,32 @@ module ExecJS
     #   encoding:    'UTF-16LE' # CScript with //U returns UTF-16LE
     # )
 
-
     def self.autodetect
       from_environment || best_available ||
-        raise(RuntimeUnavailable, "Could not find a JavaScript runtime. " +
-          "See https://github.com/sstephenson/execjs for a list of available runtimes.")
+        fail(RuntimeUnavailable, 'Could not find a JavaScript runtime. ' \
+          'See https://github.com/sstephenson/execjs for a list of available runtimes.')
     end
 
     def self.best_available
-      runtimes.reject(&:deprecated?).find(&:available?)
+      runtimes.find(&:available?)
     end
 
     def self.from_environment
-      if name = ENV["EXECJS_RUNTIME"]
+      if name = ENV['EXECJS_RUNTIME']
         if runtime = const_get(name)
           if runtime.available?
             runtime if runtime.available?
           else
-            raise RuntimeUnavailable, "#{runtime.name} runtime is not available on this system"
+            fail RuntimeUnavailable, "#{runtime.name} runtime is not available on this system"
           end
         elsif !name.empty?
-          raise RuntimeUnavailable, "#{name} runtime is not defined"
+          fail RuntimeUnavailable, "#{name} runtime is not defined"
         end
       end
     end
 
     def self.names
-      @names ||= constants.inject({}) { |h, name| h.merge(const_get(name) => name) }.values
+      @names ||= constants.reduce({}) { |h, name| h.merge(const_get(name) => name) }.values
     end
 
     def self.runtimes

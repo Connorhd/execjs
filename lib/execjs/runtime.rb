@@ -5,7 +5,7 @@ module ExecJS
   # Abstract base class for runtimes
   class Runtime
     class Context
-      def initialize(runtime, source = "")
+      def initialize(runtime, source = '')
         @mutex = Mutex.new
         @runtime = runtime
         create_context
@@ -16,7 +16,7 @@ module ExecJS
         eval "(function(){#{source}})()", options
       end
 
-      def eval(source, options = {})
+      def eval(source, _options = {})
         source.encode!('UTF-8')
 
         if /\S/ =~ source
@@ -30,19 +30,19 @@ module ExecJS
         eval "#{properties}.apply(this, #{JSON.dump(args)})"
       end
 
-      protected
+      private
 
       def create_context
-        raise NotImplementedError
+        fail NotImplementedError
       end
 
-      def evaluate_string(str)
-        raise NotImplementedError
+      def evaluate_string(_str)
+        fail NotImplementedError
       end
     end
 
     def name
-      raise NotImplementedError
+      fail NotImplementedError
     end
 
     def context_class
@@ -68,7 +68,7 @@ module ExecJS
     end
 
     def available?
-      raise NotImplementedError
+      fail NotImplementedError
     end
   end
 end

@@ -1,4 +1,4 @@
-require "execjs/runtime"
+require 'execjs/runtime'
 
 module ExecJS
   class RubyRacerRuntime < Runtime
@@ -10,7 +10,7 @@ module ExecJS
       def evaluate_string(str)
         @v8_context.eval(str)
       rescue ::V8::JSError => e
-        if e.value["name"] == "SyntaxError"
+        if e.value['name'] == 'SyntaxError'
           raise RuntimeError, e.value.to_s
         else
           raise ProgramError, e.value.to_s
@@ -19,11 +19,11 @@ module ExecJS
     end
 
     def name
-      "therubyracer (V8)"
+      'therubyracer (V8)'
     end
 
     def available?
-      require "v8"
+      require 'v8'
       true
     rescue LoadError
       false

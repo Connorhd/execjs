@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-require "execjs/runtime"
-require "open3"
-require "thread"
-require "json"
+require 'execjs/runtime'
+require 'open3'
+require 'thread'
+require 'json'
 
 module ExecJS
   class PersistentExternalRuntime < Runtime
@@ -18,7 +18,7 @@ module ExecJS
         object_id = self.object_id
         mutex = @mutex
         ObjectSpace.define_finalizer(self, proc do
-          source = JSON.dump([object_id])+"\n"
+          source = JSON.dump([object_id]) + "\n"
 
           mutex.synchronize do
             runtime.send(:exec_runtime, source)
@@ -28,17 +28,17 @@ module ExecJS
 
       def evaluate_string(str)
         str = str.gsub(/[\u0080-\uffff]/) do |ch|
-          "\\u%04x" % ch.codepoints.to_a
+          '\\u%04x' % ch.codepoints.to_a
         end
 
-        result = @runtime.send(:exec_runtime, JSON.dump([self.object_id, str])+"\n")
+        result = @runtime.send(:exec_runtime, JSON.dump([object_id, str]) + "\n")
         status, value = result.empty? ? [] : ::JSON.parse(result)
-        if status == "ok"
+        if status == 'ok'
           value
         elsif value =~ /Syntax/
-          raise RuntimeError, value
+          fail RuntimeError, value
         else
-          raise ProgramError, value
+          fail ProgramError, value
         end
       end
     end
@@ -59,56 +59,55 @@ module ExecJS
     end
 
     private
-      def start_process
-        unless defined? @stdout
-          @stdin, @stdout = Open3.popen3(*(binary.split(' ') << @runner_path))
-          @stdin.set_encoding('UTF-8')
-          @stdout.set_encoding('UTF-8')
-        end
+    def start_process
+      unless defined? @stdout
+        @stdin, @stdout = Open3.popen3(*(binary.split(' ') << @runner_path))
+        @stdin.set_encoding('UTF-8')
+        @stdout.set_encoding('UTF-8')
+      end
+    end
+
+    def exec_runtime(source)
+      @stdin.write(source)
+      @stdin.flush
+      @stdout.readline
+    end
+
+    def binary
+      @binary ||= locate_binary
+    end
+
+    def locate_executable(cmd)
+      if ExecJS.windows? && File.extname(cmd) == ''
+        cmd << '.exe'
       end
 
-      def exec_runtime(source)
-        @stdin.write(source)
-        @stdin.flush
-        @stdout.readline
+      if File.executable? cmd
+        cmd
+      else
+        path = ENV['PATH'].split(File::PATH_SEPARATOR).find { |p|
+          full_path = File.join(p, cmd)
+          File.executable?(full_path) && File.file?(full_path)
+        }
+        path && File.expand_path(cmd, path)
       end
+    end
 
-      def binary
-        @binary ||= locate_binary
+    def locate_binary
+      if binary = which(@command)
+        binary
       end
+    end
 
-      def locate_executable(cmd)
-        if ExecJS.windows? && File.extname(cmd) == ""
-          cmd << ".exe"
-        end
+    def which(command)
+      Array(command).find do |name|
+        name, args = name.split(/\s+/, 2)
+        path = locate_executable(name)
 
-        if File.executable? cmd
-          cmd
-        else
-          path = ENV['PATH'].split(File::PATH_SEPARATOR).find { |p|
-            full_path = File.join(p, cmd)
-            File.executable?(full_path) && File.file?(full_path)
-          }
-          path && File.expand_path(cmd, path)
-        end
+        next unless path
+
+        args ? "#{path} #{args}" : path
       end
-
-
-      def locate_binary
-        if binary = which(@command)
-          binary
-        end
-      end
-
-      def which(command)
-        Array(command).find do |name|
-          name, args = name.split(/\s+/, 2)
-          path = locate_executable(name)
-
-          next unless path
-
-          args ? "#{path} #{args}" : path
-        end
-      end
+    end
   end
 end

@@ -1,5 +1,5 @@
-require "execjs/version"
-require "rbconfig"
+require 'execjs/version'
+require 'rbconfig'
 
 module ExecJS
   class Error           < ::StandardError; end
@@ -11,7 +11,7 @@ module ExecJS
     attr_reader :runtime
 
     def runtime=(runtime)
-      raise RuntimeUnavailable, "#{runtime.name} is unavailable on this system" unless runtime.available?
+      fail RuntimeUnavailable, "#{runtime.name} is unavailable on this system" unless runtime.available?
       @runtime = runtime
     end
 
@@ -28,11 +28,11 @@ module ExecJS
     end
 
     def root
-      @root ||= File.expand_path("..", __FILE__)
+      @root ||= File.expand_path('..', __FILE__)
     end
 
     def windows?
-      @windows ||= RbConfig::CONFIG["host_os"] =~ /mswin|mingw/
+      @windows ||= RbConfig::CONFIG['host_os'] =~ /mswin|mingw/
     end
   end
 end
