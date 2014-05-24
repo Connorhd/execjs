@@ -171,16 +171,35 @@ class TestExecJS < Test
     assert_equal 64, context.call('CoffeeScript.eval', '((x) -> x * x)(8)')
   end
 
-  # def test_lots
-  #   context = ExecJS.compile('')
-  #   threads = []
-  #   100.times {
-  #     threads << Thread.new {
-  #       1000.times {
-  #         context.eval('1+1')
-  #       }
-  #     }
-  #   }
-  #   threads.each { |t| t.join }
+  def test_persistent_context
+    context = ExecJS.compile('')
+    context.exec('x = 1')
+    assert_equal 1, context.eval('x')
+  end
+
+  # def test_isolated_context
+  #   context1 = ExecJS.compile('')
+  #   context2 = ExecJS.compile('')
+  #   context1.exec('x = 1')
+  #   context2.exec('x = 2')
+  #   assert_equal 1, context1.eval('x')
+  #   assert_equal 2, context2.eval('x')
   # end
+
+  def test_thread_safe
+    context = ExecJS.compile('')
+    threads = []
+    count = 0
+    10.times do
+      threads << Thread.new do
+        context.exec('i = 0; while (i < 10000) { i++ }')
+        Thread.exclusive do
+          count += 1
+        end
+      end
+    end
+    threads.each { |t| t.join }
+    assert_equal 10, count
+  end
+
 end
