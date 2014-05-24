@@ -24,7 +24,6 @@ module ExecJS
 
     def available?
       require 'rjb'
-      Rjb.throw('java.util.NoSuchElementException', 'test exception')
       Rjb.load
       !Rjb.import('javax.script.ScriptEngineManager').new.getEngineByName('nashorn').nil?
     rescue LoadError

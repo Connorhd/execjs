@@ -1,7 +1,7 @@
 require 'execjs/runtime'
 
 module ExecJS
-  class RubyRhinoRuntime < Runtime
+  class RhinoRuntime < Runtime
     class Context < Runtime::Context
       def create_context
         @rhino_context = org.mozilla.javascript.Context.enter
@@ -19,8 +19,6 @@ module ExecJS
         raise RuntimeError, e.message
       rescue org.mozilla.javascript.JavaScriptException, org.mozilla.javascript.EcmaError => e
         raise ProgramError, e.message
-      rescue org.mozilla.javascript.EvaluatorException => e
-        raise RuntimeError, e.message
       end
     end
 
@@ -30,8 +28,8 @@ module ExecJS
 
     def available?
       require 'rhino/jar_path'
-      load Rhino::JAR_PATH
-      true
+      require Rhino::JAR_PATH
+      !org.mozilla.javascript.Context.enter.nil?
     rescue LoadError
       false
     end

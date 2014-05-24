@@ -2,7 +2,8 @@ require 'execjs/module'
 require 'execjs/disabled_runtime'
 require 'execjs/external_runtime'
 require 'execjs/ruby_racer_runtime'
-require 'execjs/ruby_rhino_runtime'
+require 'execjs/rhino_runtime'
+require 'execjs/rjb_rhino_runtime'
 require 'execjs/nashorn_runtime'
 require 'execjs/rjb_nashorn_runtime'
 require 'execjs/persistent_external_runtime'
@@ -13,7 +14,9 @@ module ExecJS
 
     RubyRacer = RubyRacerRuntime.new
 
-    RubyRhino = RubyRhinoRuntime.new
+    Rhino = RhinoRuntime.new
+
+    RjbRhino = RjbRhinoRuntime.new
 
     Nashorn = NashornRuntime.new
 
@@ -98,7 +101,8 @@ module ExecJS
     def self.runtimes
       @runtimes ||= [
         RubyRacer,
-        RubyRhino,
+        Rhino,
+        RjbRhino,
         Nashorn,
         RjbNashorn,
         PersistentNode,
