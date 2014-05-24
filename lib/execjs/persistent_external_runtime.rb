@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 require "execjs/runtime"
 require "open3"
 require "thread"
@@ -26,6 +27,10 @@ module ExecJS
       end
 
       def evaluate_string(str)
+        str = str.gsub(/[\u0080-\uffff]/) do |ch|
+          "\\u%04x" % ch.codepoints.to_a
+        end
+
         result = @runtime.send(:exec_runtime, JSON.dump([self.object_id, str])+"\n")
         status, value = result.empty? ? [] : ::JSON.parse(result)
         if status == "ok"
@@ -41,11 +46,12 @@ module ExecJS
     attr_reader :name
 
     def initialize(options)
-      @name        = options[:name]
-      @command     = options[:command]
-      @runner_path = options[:runner_path]
-      @binary      = nil
-      @mutex       = Mutex.new
+      @name          = options[:name]
+      @command       = options[:command]
+      @runner_path   = options[:runner_path]
+      @multi_context = options[:multi_context]
+      @binary        = nil
+      @mutex         = Mutex.new
     end
 
     def available?

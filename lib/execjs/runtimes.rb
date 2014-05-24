@@ -17,9 +17,17 @@ module ExecJS
     Nashorn = NashornRuntime.new
 
     PersistentNode = PersistentExternalRuntime.new(
-      :name        => "Persistent Node.js (V8)",
-      :command     => ["nodejs", "node"],
-      :runner_path => ExecJS.root + "/support/persistent_node_runner.js",
+      name:          "Persistent Node.js (V8)",
+      command:       ["nodejs", "node"],
+      runner_path:   ExecJS.root + "/support/persistent_node_runner.js",
+      multi_context: true
+    )
+
+    PersistentJavaScriptCore = PersistentExternalRuntime.new(
+      name:          "Persistent Node.js (V8)",
+      command:       "/System/Library/Frameworks/JavaScriptCore.framework/Versions/A/Resources/jsc",
+      runner_path:   ExecJS.root + "/support/persistent_jsc_runner.js",
+      multi_context: true
     )
 
     # Node = ExternalRuntime.new(
@@ -84,6 +92,7 @@ module ExecJS
         RubyRhino,
         Nashorn,
         PersistentNode,
+        PersistentJavaScriptCore,
         # Node,
         # JavaScriptCore,
         # SpiderMonkey,
