@@ -1,23 +1,41 @@
-require "execjs/encoding"
+require 'thread'
+require 'json'
 
 module ExecJS
   # Abstract base class for runtimes
   class Runtime
     class Context
-      include Encoding
-
       def initialize(runtime, source = "")
+        @mutex = Mutex.new
+        create_context
+        exec source
       end
 
       def exec(source, options = {})
-        raise NotImplementedError
+        eval "(function(){#{source}})()", options
       end
 
       def eval(source, options = {})
-        raise NotImplementedError
+        source.encode!('UTF-8')
+
+        if /\S/ =~ source
+          @mutex.synchronize do
+            JSON.parse(evaluate_string("JSON.stringify([#{source}])"))[0]
+          end
+        end
       end
 
       def call(properties, *args)
+        eval "#{properties}.apply(this, #{JSON.dump(args)})"
+      end
+
+      protected
+
+      def create_context
+        raise NotImplementedError
+      end
+
+      def evaluate_string(str)
         raise NotImplementedError
       end
     end

@@ -1,8 +1,6 @@
 require "execjs/module"
 require "execjs/disabled_runtime"
 require "execjs/external_runtime"
-require "execjs/johnson_runtime"
-require "execjs/mustang_runtime"
 require "execjs/ruby_racer_runtime"
 require "execjs/ruby_rhino_runtime"
 require "execjs/nashorn_runtime"
@@ -17,36 +15,32 @@ module ExecJS
 
     Nashorn = NashornRuntime.new
 
-    Johnson = JohnsonRuntime.new
+    # Node = ExternalRuntime.new(
+    #   name:        "Node.js (V8)",
+    #   command:     ["nodejs", "node"],
+    #   runner_path: ExecJS.root + "/support/node_runner.js",
+    #   encoding:    'UTF-8'
+    # )
 
-    Mustang = MustangRuntime.new
+    # JavaScriptCore = ExternalRuntime.new(
+    #   name:        "JavaScriptCore",
+    #   command:     "/System/Library/Frameworks/JavaScriptCore.framework/Versions/A/Resources/jsc",
+    #   runner_path: ExecJS.root + "/support/jsc_runner.js"
+    # )
 
-    Node = ExternalRuntime.new(
-      name:        "Node.js (V8)",
-      command:     ["nodejs", "node"],
-      runner_path: ExecJS.root + "/support/node_runner.js",
-      encoding:    'UTF-8'
-    )
+    # SpiderMonkey = Spidermonkey = ExternalRuntime.new(
+    #   name:        "SpiderMonkey",
+    #   command:     "js",
+    #   runner_path: ExecJS.root + "/support/spidermonkey_runner.js",
+    #   deprecated:  true
+    # )
 
-    JavaScriptCore = ExternalRuntime.new(
-      name:        "JavaScriptCore",
-      command:     "/System/Library/Frameworks/JavaScriptCore.framework/Versions/A/Resources/jsc",
-      runner_path: ExecJS.root + "/support/jsc_runner.js"
-    )
-
-    SpiderMonkey = Spidermonkey = ExternalRuntime.new(
-      name:        "SpiderMonkey",
-      command:     "js",
-      runner_path: ExecJS.root + "/support/spidermonkey_runner.js",
-      deprecated:  true
-    )
-
-    JScript = ExternalRuntime.new(
-      name:        "JScript",
-      command:     "cscript //E:jscript //Nologo //U",
-      runner_path: ExecJS.root + "/support/jscript_runner.js",
-      encoding:    'UTF-16LE' # CScript with //U returns UTF-16LE
-    )
+    # JScript = ExternalRuntime.new(
+    #   name:        "JScript",
+    #   command:     "cscript //E:jscript //Nologo //U",
+    #   runner_path: ExecJS.root + "/support/jscript_runner.js",
+    #   encoding:    'UTF-16LE' # CScript with //U returns UTF-16LE
+    # )
 
 
     def self.autodetect
@@ -82,12 +76,10 @@ module ExecJS
         RubyRacer,
         RubyRhino,
         Nashorn,
-        Johnson,
-        Mustang,
-        Node,
-        JavaScriptCore,
-        SpiderMonkey,
-        JScript
+        # Node,
+        # JavaScriptCore,
+        # SpiderMonkey,
+        # JScript
       ]
     end
   end

@@ -170,4 +170,17 @@ class TestExecJS < Test
     context = ExecJS.compile(source)
     assert_equal 64, context.call("CoffeeScript.eval", "((x) -> x * x)(8)")
   end
+
+  # def test_lots
+  #   context = ExecJS.compile('')
+  #   threads = []
+  #   100.times {
+  #     threads << Thread.new {
+  #       1000.times {
+  #         context.eval('1+1')
+  #       }
+  #     }
+  #   }
+  #   threads.each { |t| t.join }
+  # end
 end
