@@ -27,7 +27,7 @@ module ExecJS
       Rjb.throw('java.util.NoSuchElementException', 'test exception')
       Rjb.load
       !Rjb.import('javax.script.ScriptEngineManager').new.getEngineByName('nashorn').nil?
-    rescue LoadError, NoClassDefFoundError
+    rescue LoadError
       false
     end
   end

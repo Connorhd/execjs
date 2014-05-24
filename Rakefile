@@ -39,7 +39,7 @@ task :test do
 
     begin
       task.invoke
-    rescue => e
+    rescue Exception => e
       if e.message[/Command failed with status \((\d+)\)/, 1] == '2'
         skipped << task.name
       elsif e.message == '2' # jruby
