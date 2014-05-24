@@ -35,7 +35,7 @@ module ExecJS
         status, value = result.empty? ? [] : ::JSON.parse(result)
         if status == "ok"
           value
-        elsif value =~ /SyntaxError:/
+        elsif value =~ /Syntax/
           raise RuntimeError, value
         else
           raise ProgramError, value
@@ -62,6 +62,8 @@ module ExecJS
       def start_process
         unless defined? @stdout
           @stdin, @stdout = Open3.popen3(*(binary.split(' ') << @runner_path))
+          @stdin.set_encoding('UTF-8')
+          @stdout.set_encoding('UTF-8')
         end
       end
 

@@ -29,6 +29,13 @@ module ExecJS
       runner_path:   ExecJS.root + "/support/persistent_jsc_runner.js",
       multi_context: true
     )
+    
+    PersistentJScript = PersistentExternalRuntime.new(
+      name:          "Persistent JScript",
+      command:       "cscript //E:jscript //Nologo",
+      runner_path:   ExecJS.root + "/support/persistent_jscript_runner.js",
+      multi_context: true
+    )
 
     # Node = ExternalRuntime.new(
     #   name:        "Node.js (V8)",
@@ -93,6 +100,7 @@ module ExecJS
         Nashorn,
         PersistentNode,
         PersistentJavaScriptCore,
+        PersistentJScript,
         # Node,
         # JavaScriptCore,
         # SpiderMonkey,
