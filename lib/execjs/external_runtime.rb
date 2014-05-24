@@ -8,21 +8,16 @@ module ExecJS
   class ExternalRuntime < Runtime
     class Context < Runtime::Context
       def create_context
-        @mutex = @runtime.instance_variable_get(:@mutex)
-
-        @mutex.synchronize do
-          @runtime.send(:start_process)
+        @stdin, @stdout = @runtime.get_process
+        unless @runtime.get_mutex.nil?
+          @mutex = @runtime.get_mutex
         end
 
         runtime = @runtime
-        object_id = self.object_id
-        mutex = @mutex
-        ObjectSpace.define_finalizer(self, proc do
-          source = JSON.dump([object_id]) + "\n"
+        context_id = self.object_id
 
-          mutex.synchronize do
-            runtime.send(:exec_runtime, source)
-          end
+        ObjectSpace.define_finalizer(self, proc do
+          runtime.clean_up_context(context_id)
         end)
       end
 
@@ -31,7 +26,10 @@ module ExecJS
           '\\u%04x' % ch.codepoints.to_a
         end
 
-        result = @runtime.send(:exec_runtime, JSON.dump([object_id, str]) + "\n")
+        @stdin.write(JSON.dump([object_id, str]) + "\n")
+        @stdin.flush
+        result = @stdout.readline
+
         status, value = result.empty? ? [] : ::JSON.parse(result)
         if status == 'ok'
           value
@@ -49,30 +47,47 @@ module ExecJS
       @name          = options[:name]
       @command       = options[:command]
       @runner_path   = options[:runner_path]
-      @multi_context = options[:multi_context]
-      @binary        = nil
-      @mutex         = Mutex.new
+      @multi_context = !!options[:multi_context]
+      @stdin         = nil
+      @stdout        = nil
     end
 
     def available?
       binary ? true : false
     end
 
-    private
-
-    def start_process
-      unless defined? @stdout
-        @stdin, @stdout = Open3.popen3(*(binary.split(' ') << @runner_path))
-        @stdin.set_encoding('ASCII')
-        @stdout.set_encoding('UTF-8')
+    def get_mutex
+      @mutex ||= if @multi_context
+        Mutex.new
+      else
+        nil
       end
     end
 
-    def exec_runtime(source)
-      @stdin.write(source)
-      @stdin.flush
-      @stdout.readline
+    def get_process
+      if @multi_context && @stdout
+        return @stdin, @stdout
+      end
+      stdin, stdout = Open3.popen3(*(binary.split(' ') << @runner_path))
+      stdin.set_encoding('ASCII')
+      stdout.set_encoding('UTF-8')
+      if @multi_context
+        @stdin, @stdout = stdin, stdout
+      end
+      return stdin, stdout
     end
+
+    def clean_up_context(context_id)
+      if @multi_context
+        @stdin.write(JSON.dump([context_id]) + "\n")
+        @stdin.flush
+      else
+        @stdin.close
+        @stdout.close
+      end
+    end
+
+    private
 
     def binary
       @binary ||= locate_binary
