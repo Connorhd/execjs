@@ -24,21 +24,21 @@ module ExecJS
     PersistentNode = ExternalRuntime.new(
       name:          'Persistent Node.js (V8)',
       command:       %w(nodejs node),
-      runner_path:   ExecJS.root + '/support/persistent_node_runner.js',
+      runner_path:   ExecJS.root + '/support/node_runner.js',
       multi_context: true
     )
 
     PersistentJavaScriptCore = ExternalRuntime.new(
       name:          'Persistent Node.js (V8)',
       command:       '/System/Library/Frameworks/JavaScriptCore.framework/Versions/A/Resources/jsc',
-      runner_path:   ExecJS.root + '/support/persistent_jsc_runner.js',
+      runner_path:   ExecJS.root + '/support/jsc_runner.js',
       multi_context: false
     )
 
     PersistentJScript = ExternalRuntime.new(
       name:          'Persistent JScript',
       command:       'cscript //E:jscript //Nologo',
-      runner_path:   ExecJS.root + '/support/persistent_jscript_runner.js',
+      runner_path:   ExecJS.root + '/support/jscript_runner.js',
       multi_context: false
     )
 
