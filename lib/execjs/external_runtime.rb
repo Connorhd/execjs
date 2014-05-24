@@ -14,7 +14,7 @@ module ExecJS
         end
 
         runtime = @runtime
-        context_id = self.object_id
+        context_id = object_id
 
         ObjectSpace.define_finalizer(self, proc do
           runtime.clean_up_context(context_id)
@@ -74,7 +74,7 @@ module ExecJS
       if @multi_context
         @stdin, @stdout = stdin, stdout
       end
-      return stdin, stdout
+      [stdin, stdout]
     end
 
     def clean_up_context(context_id)

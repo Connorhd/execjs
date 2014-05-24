@@ -201,5 +201,4 @@ class TestExecJS < Test
     threads.each { |t| t.join }
     assert_equal 10, count
   end
-
 end
