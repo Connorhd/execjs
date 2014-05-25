@@ -8,7 +8,12 @@ module ExecJS
       end
 
       def evaluate_string(str)
-        @nashorn_context.eval(str).toString
+        output = @nashorn_context.eval(str)
+        if output.nil?
+          nil
+        else
+          output.toString
+        end
       rescue ScriptException => e
         if e.message =~ /^\<eval\>/
           raise RuntimeError, e.message

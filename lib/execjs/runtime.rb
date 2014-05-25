@@ -9,7 +9,9 @@ module ExecJS
         @mutex = Mutex.new
         @runtime = runtime
         create_context
-        exec source
+        @mutex.synchronize do
+          evaluate_string(source.encode('UTF-8'))
+        end
       end
 
       def exec(source)

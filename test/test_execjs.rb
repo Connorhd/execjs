@@ -201,4 +201,14 @@ class TestExecJS < Test
     threads.each { |t| t.join }
     assert_equal 10, count
   end
+
+  def test_safely_serialize
+    context = ExecJS.compile('x = function (a) { return a; };')
+    assert_equal 'test', context.call('x', :test)
+  end
+
+  def test_compile_creates_globals
+    context = ExecJS.compile('var x = function (a) { return a; };')
+    assert_equal 'test', context.call('x', 'test')
+  end
 end
