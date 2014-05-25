@@ -16,27 +16,6 @@ elsif defined? MiniTest::Unit::TestCase
 end
 
 class TestExecJS < Test
-  def test_runtime_available
-    runtime = ExecJS::ExternalRuntime.new(command: 'nonexistent')
-    assert !runtime.available?
-
-    runtime = ExecJS::ExternalRuntime.new(command: 'ruby')
-    assert runtime.available?
-  end
-
-  def test_runtime_assignment
-    original_runtime = ExecJS.runtime
-    runtime = ExecJS::ExternalRuntime.new(command: 'nonexistent')
-    assert_raises(ExecJS::RuntimeUnavailable) { ExecJS.runtime = runtime }
-    assert_equal original_runtime, ExecJS.runtime
-
-    runtime = ExecJS::ExternalRuntime.new(command: 'ruby')
-    ExecJS.runtime = runtime
-    assert_equal runtime, ExecJS.runtime
-  ensure
-    ExecJS.runtime = original_runtime
-  end
-
   def test_context_call
     context = ExecJS.compile('id = function(v) { return v; }')
     assert_equal 'bar', context.call('id', 'bar')

@@ -29,7 +29,7 @@ module ExecJS
     end
 
     def name
-      'therubyrhino (Rhino)'
+      'rhino'
     end
 
     def available?

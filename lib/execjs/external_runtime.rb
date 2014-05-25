@@ -8,7 +8,8 @@ module ExecJS
   class ExternalRuntime < Runtime
     class Context < Runtime::Context
       def create_context
-        @stdin, @stdout = @runtime.get_process
+        stdin, stdout, stderr = @runtime.get_process 
+        @stdin, @stdout = stdin, stdout
         unless @runtime.get_mutex.nil?
           @mutex = @runtime.get_mutex
         end
@@ -17,8 +18,27 @@ module ExecJS
         context_id = object_id
 
         ObjectSpace.define_finalizer(self, proc do
-          runtime.clean_up_context(context_id)
+          if runtime.instance_variable_get(:@multi_context)
+            runtime.get_mutex.synchronize do
+              stdin.write(JSON.dump([context_id]) + "\n")
+              stdin.flush
+              stdout.readline
+            end
+          else
+            stdin.close unless stdin.closed?
+            stdout.close unless stdout.closed?
+            stderr.close unless stderr.closed?
+          end
         end)
+
+        if ExecJS.cygwin?
+          # Child processes prevent ruby exiting under cygwin
+          at_exit do
+            stdin.close unless stdin.closed?
+            stdout.close unless stdout.closed?
+            stderr.close unless stderr.closed?
+          end
+        end
       end
 
       def evaluate_string(str)
@@ -60,11 +80,13 @@ module ExecJS
       @runner_path   = options[:runner_path]
       @multi_context = !!options[:multi_context]
       @chunk_size    = options[:chunk_size]
+      @cygwin        = !!options[:cygwin]
       @stdin         = nil
       @stdout        = nil
     end
 
     def available?
+      return @cygwin if ExecJS.cygwin?
       binary ? true : false
     end
 
@@ -80,24 +102,13 @@ module ExecJS
       if @multi_context && @stdout
         return @stdin, @stdout
       end
-      stdin, stdout = Open3.popen3(*(binary.split(' ') << @runner_path))
+      stdin, stdout, stderr = Open3.popen3(*(binary.split(' ') << @runner_path))
       stdin.set_encoding('ASCII')
       stdout.set_encoding('UTF-8')
       if @multi_context
         @stdin, @stdout = stdin, stdout
       end
-      [stdin, stdout]
-    end
-
-    def clean_up_context(context_id)
-      if @multi_context
-        @stdin.write(JSON.dump([context_id]) + "\n")
-        @stdin.flush
-        @stdout.readline
-      else
-        @stdin.close
-        @stdout.close
-      end
+      [stdin, stdout, stderr]
     end
 
     private

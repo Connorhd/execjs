@@ -28,11 +28,19 @@ module ExecJS
     end
 
     def root
-      @root ||= File.expand_path('..', __FILE__)
+      @root ||= if cygwin?
+        `cygpath -w #{File.expand_path('..', __FILE__)}`.strip
+      else
+        File.expand_path('..', __FILE__)
+      end
     end
 
     def windows?
       @windows ||= RbConfig::CONFIG['host_os'] =~ /mswin|mingw/
+    end
+
+    def cygwin?
+      @cygwin ||= RbConfig::CONFIG['arch'] =~ /cygwin/
     end
   end
 end
