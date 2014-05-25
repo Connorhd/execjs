@@ -21,22 +21,22 @@ module ExecJS
 
     RjbNashorn = RjbNashornRuntime.new
 
-    PersistentNode = ExternalRuntime.new(
-      name:          'Persistent Node.js (V8)',
+    Node = ExternalRuntime.new(
+      name:          'Node.js (V8)',
       command:       %w(nodejs node),
       runner_path:   ExecJS.root + '/support/node_runner.js',
       multi_context: true
     )
 
-    PersistentJavaScriptCore = ExternalRuntime.new(
-      name:          'Persistent Node.js (V8)',
+    JavaScriptCore = ExternalRuntime.new(
+      name:          'JavaScriptCore',
       command:       '/System/Library/Frameworks/JavaScriptCore.framework/Versions/A/Resources/jsc',
       runner_path:   ExecJS.root + '/support/jsc_runner.js',
       multi_context: false
     )
 
-    PersistentJScript = ExternalRuntime.new(
-      name:          'Persistent JScript',
+    JScript = ExternalRuntime.new(
+      name:          'JScript',
       command:       'cscript //E:jscript //Nologo',
       runner_path:   ExecJS.root + '/support/jscript_runner.js',
       multi_context: false
@@ -72,14 +72,14 @@ module ExecJS
 
     def self.runtimes
       @runtimes ||= [
-        PersistentNode,
+        Node,
         RubyRacer,
         Nashorn,
         Rhino,
         RjbNashorn,
         RjbRhino,
-        PersistentJScript,
-        PersistentJavaScriptCore,
+        JScript,
+        JavaScriptCore,
       ]
     end
   end
