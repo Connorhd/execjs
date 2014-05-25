@@ -39,7 +39,8 @@ module ExecJS
       name:          'JScript',
       command:       'cscript //E:jscript //Nologo',
       runner_path:   ExecJS.root + '/support/jscript_runner.js',
-      multi_context: false
+      multi_context: false,
+      chunk_size:    4096
     )
 
     def self.autodetect

@@ -26,8 +26,19 @@ module ExecJS
           '\\u%04x' % ch.codepoints.to_a
         end
 
-        @stdin.write(JSON.dump([object_id, str]) + "\n")
+        str = JSON.dump([object_id, str])
+
+        if @runtime.instance_variable_get(:@chunk_size).nil?
+          @stdin.write(str+"\n")
+        else
+          until str.empty?
+            @stdin.write(str.slice!(0..@runtime.instance_variable_get(:@chunk_size))+"\n")
+          end
+          @stdin.write("END\n")
+        end
+
         @stdin.flush
+
         result = @stdout.readline
 
         status, value = result.empty? ? [] : ::JSON.parse(result)
@@ -48,6 +59,7 @@ module ExecJS
       @command       = options[:command]
       @runner_path   = options[:runner_path]
       @multi_context = !!options[:multi_context]
+      @chunk_size    = options[:chunk_size]
       @stdin         = nil
       @stdout        = nil
     end
